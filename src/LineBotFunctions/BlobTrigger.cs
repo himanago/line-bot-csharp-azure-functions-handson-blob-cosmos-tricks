@@ -65,6 +65,7 @@ public class BlobTrigger
             });
             await Api.ReplyMessageAsync(replyMessageRequest);
 
+            // SAS トークンつき URL を含むメッセージオブジェクトをログ出力
             log.LogInformation(new ImageMessage(contentUrl, contentUrl)
                 {
                     Type = "image"
