@@ -27,6 +27,10 @@ param logAnalyticsName string = ''
 param resourceGroupName string = ''
 param storageAccountName string = ''
 
+// 追加
+param cosmosAccountName string = ''
+var cosmosDatabaseName = 'cosmos-db-database-messagedb'
+
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
@@ -54,6 +58,7 @@ module api './app/api.bicep' = {
     keyVaultName: keyVault.outputs.name
     storageAccountName: storage.outputs.name
     lineChannelAccessToken: lineChannelAccessToken
+    cosmosConnectionStringKey: cosmos.outputs.connectionStringKey
   }
 }
 
@@ -100,6 +105,20 @@ module monitoring './core/monitor/monitoring.bicep' = {
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
     applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
     applicationInsightsDashboardName: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
+  }
+}
+
+// 追加
+// The application database
+module cosmos './app/db.bicep' = {
+  name: 'cosmos'
+  scope: rg
+  params: {
+    accountName: !empty(cosmosAccountName) ? cosmosAccountName : '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
+    location: location
+    tags: tags
+    keyVaultName: keyVault.outputs.name
+    cosmosDatabaseName: cosmosDatabaseName
   }
 }
 

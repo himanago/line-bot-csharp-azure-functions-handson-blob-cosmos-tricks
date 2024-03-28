@@ -9,6 +9,9 @@ param storageAccountName string
 param functionAppAdditionalAppSettings array = []
 param lineChannelAccessToken string
 
+// 追加
+param cosmosConnectionStringKey string
+
 var lineChannelAccessTokenSecretName = 'line-channel-access-token'
 
 var functionAppCoreAppSettings = [
@@ -39,6 +42,19 @@ var functionAppCoreAppSettings = [
   {
     name: 'LineBotSettings:ChannelAccessToken'
     value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${lineChannelAccessTokenSecretName})'
+  }
+  // 追加
+  {
+    name: 'cosmosDbConnectionString'
+    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${cosmosConnectionStringKey})'
+  }
+  {
+    name: 'DurableManagementStorage'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+  }
+  {
+    name: 'TaskHubName'
+    value: 'ProdTaskHub'
   }
 ]
 var functionAppAppSettings = length(functionAppAdditionalAppSettings) == 0 ? functionAppCoreAppSettings : concat(functionAppCoreAppSettings,functionAppAdditionalAppSettings)
